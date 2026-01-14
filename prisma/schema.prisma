@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+
+enum TicketStatus {
+  ABIERTO
+  EN_PROGRESO
+  CERRADO
+  ARCHIVADO
+}
+
+model Client {
+  id        Int      @id @default(autoincrement())
+  name      String
+  phone     String?
+  email     String?
+  address   String?
+  createdAt DateTime @default(now())
+
+  tickets   Ticket[]
+}
+
+model Ticket {
+  id          Int          @id @default(autoincrement())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  title       String
+  description String?
+  status      TicketStatus @default(ABIERTO)
+
+  amount      Int          @default(0)  // en pesos, entero
+  dueDate     DateTime?
+  isPaid      Boolean      @default(false)
+
+  clientId    Int?
+  client      Client?      @relation(fields: [clientId], references: [id])
+
+  payments    Payment[]
+}
+
+model Payment {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  amount    Int      @default(0)
+  method    String?  // efectivo, transferencia, etc.
+  note      String?
+
+  ticketId  Int
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
+}
