@@ -7,52 +7,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-enum TicketStatus {
-  ABIERTO
-  EN_PROGRESO
-  CERRADO
-  ARCHIVADO
+model Config {
+  id          Int      @id @default(1)
+  ticketValue Int      @default(0) 
+  kmValue     Int      @default(0) 
+  updatedAt   DateTime @updatedAt
 }
 
 model Client {
   id        Int      @id @default(autoincrement())
   name      String
   phone     String?
-  email     String?
-  address   String?
-  createdAt DateTime @default(now())
-
-  tickets   Ticket[]
+  tickets   Ticket[] // Relación con Ticket
 }
 
 model Ticket {
-  id          Int          @id @default(autoincrement())
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id            Int      @id @default(autoincrement())
+  ticketId      String   // El ID manual de tu Excel (ej: 814967-9)
+  createdAt     DateTime @default(now())
+  
+  title         String   // Descripción del servicio
+  status        String   @default("Pendiente") // Pagado / Pendiente
+  
+  // Datos de tu Excel
+  numTickets    Int      @default(1)     // Columna "TKS"
+  km            Int      @default(0)     // Columna "KM"
+  applyViatico  Boolean  @default(false) // Columna "Aplica_Viatico"
+  
+  // Valores calculados
+  amountTicket  Int      @default(0) // Importe_Ticket
+  amountViatico Int      @default(0) // Importe_Viatico
+  totalAmount   Int      @default(0) // Total_a_Cobrar
+  
+  fechaPago     String?  // Columna "Fecha_Pago"
 
-  title       String
-  description String?
-  status      TicketStatus @default(ABIERTO)
-
-  amount      Int          @default(0)  // en pesos, entero
-  dueDate     DateTime?
-  isPaid      Boolean      @default(false)
-
-  clientId    Int?
-  client      Client?      @relation(fields: [clientId], references: [id])
-
-  payments    Payment[]
+  // Arreglo de relaciones para que no de error
+  clientId      Int?
+  client        Client?   @relation(fields: [clientId], references: [id])
+  payments      Payment[]
 }
 
 model Payment {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
-
   amount    Int      @default(0)
-  method    String?  // efectivo, transferencia, etc.
-  note      String?
-
   ticketId  Int
   ticket    Ticket   @relation(fields: [ticketId], references: [id])
 }

@@ -1,24 +1,32 @@
 -- CreateTable
+CREATE TABLE "Config" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT DEFAULT 1,
+    "ticketValue" INTEGER NOT NULL DEFAULT 0,
+    "kmValue" INTEGER NOT NULL DEFAULT 0,
+    "updatedAt" DATETIME NOT NULL
+);
+
+-- CreateTable
 CREATE TABLE "Client" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "name" TEXT NOT NULL,
-    "phone" TEXT,
-    "email" TEXT,
-    "address" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "phone" TEXT
 );
 
 -- CreateTable
 CREATE TABLE "Ticket" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "ticketId" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
     "title" TEXT NOT NULL,
-    "description" TEXT,
-    "status" TEXT NOT NULL DEFAULT 'ABIERTO',
-    "amount" INTEGER NOT NULL DEFAULT 0,
-    "dueDate" DATETIME,
-    "isPaid" BOOLEAN NOT NULL DEFAULT false,
+    "status" TEXT NOT NULL DEFAULT 'Pendiente',
+    "numTickets" INTEGER NOT NULL DEFAULT 1,
+    "km" INTEGER NOT NULL DEFAULT 0,
+    "applyViatico" BOOLEAN NOT NULL DEFAULT false,
+    "amountTicket" INTEGER NOT NULL DEFAULT 0,
+    "amountViatico" INTEGER NOT NULL DEFAULT 0,
+    "totalAmount" INTEGER NOT NULL DEFAULT 0,
+    "fechaPago" TEXT,
     "clientId" INTEGER,
     CONSTRAINT "Ticket_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "Client" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
@@ -28,8 +36,6 @@ CREATE TABLE "Payment" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "amount" INTEGER NOT NULL DEFAULT 0,
-    "method" TEXT,
-    "note" TEXT,
     "ticketId" INTEGER NOT NULL,
     CONSTRAINT "Payment_ticketId_fkey" FOREIGN KEY ("ticketId") REFERENCES "Ticket" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
